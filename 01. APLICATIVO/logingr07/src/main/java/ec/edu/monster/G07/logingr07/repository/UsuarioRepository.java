@@ -21,4 +21,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, String> {
     Optional<Usuario> findFirstByEmpleadoEmailIgnoreCase(String email);
 
     boolean existsByEmpleadoCodigoEmpleado(String codigoEmpleado);
+
+    /** Cuenta no inactiva de un empleado (impide el borrado lógico del empleado). */
+    boolean existsByEmpleadoCodigoEmpleadoAndEstadoCodigoEstadoNot(String codigoEmpleado, String codigoEstado);
 }

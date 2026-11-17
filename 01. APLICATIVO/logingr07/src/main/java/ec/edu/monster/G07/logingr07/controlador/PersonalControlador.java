@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 /**
- * Páginas JSP del sistema PERSONAL. Los permisos (P001 departamentos, P002 cargos) los verifica el SeguridadInterceptor.
+ * Páginas JSP del sistema PERSONAL. Los permisos (P001 departamentos, P002 cargos, P003 empleados) los verifica el SeguridadInterceptor.
  */
 @Controller
 public class PersonalControlador {
@@ -36,5 +36,11 @@ public class PersonalControlador {
     public String cargos(@SessionAttribute(SeguridadInterceptor.USUARIO_SESION) UsuarioSesion usuario, Model model) {
         model.addAttribute("menu", menuServicio.menu(usuario.getCodigoUsuario()));
         return "cargos";
+    }
+
+    @GetMapping("/personal/empleados")
+    public String empleados(@SessionAttribute(SeguridadInterceptor.USUARIO_SESION) UsuarioSesion usuario, Model model) {
+        model.addAttribute("menu", menuServicio.menu(usuario.getCodigoUsuario()));
+        return "empleados";
     }
 }

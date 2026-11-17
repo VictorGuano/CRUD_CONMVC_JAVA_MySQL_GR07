@@ -34,7 +34,8 @@ public class MenuServicio {
             Map.entry("S002", "bi-diagram-3"),
             Map.entry("S003", "bi-journal-text"),
             Map.entry("P001", "bi-building"),
-            Map.entry("P002", "bi-briefcase"));
+            Map.entry("P002", "bi-briefcase"),
+            Map.entry("P003", "bi-person-vcard"));
 
     private final OpcionRepository opcionRepository;
 
