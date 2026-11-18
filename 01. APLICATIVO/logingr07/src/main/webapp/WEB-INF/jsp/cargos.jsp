@@ -124,11 +124,25 @@
         }
     });
 
-    function opcionesDepartamento(seleccionado) {
-        return '<option value="">Seleccione...</option>' + departamentos.map(function (d) {
-            return '<option value="' + SIGH.esc(d.codigo) + '"' + (d.codigo === seleccionado ? " selected" : "") + '>'
-                + SIGH.esc(d.codigo + " - " + d.descripcion) + '</option>';
+    function textoDepartamento(d) {
+        return d.codigo + " - " + d.descripcion;
+    }
+
+    // Lista con filtro: al escribir se muestran solo los departamentos cuyo código o nombre coinciden
+    function opcionesDepartamento() {
+        return departamentos.map(function (d) {
+            return '<option value="' + SIGH.esc(textoDepartamento(d)) + '"></option>';
         }).join("");
+    }
+
+    /** Acepta «QUI - Quirófano», el código (QUI) o el nombre exacto (quirófano). */
+    function departamentoElegido(texto) {
+        const t = (texto || "").trim().toLowerCase();
+        if (!t) { return null; }
+        return departamentos.find(function (d) {
+            return textoDepartamento(d).toLowerCase() === t || d.codigo.toLowerCase() === t
+                || d.descripcion.toLowerCase() === t;
+        }) || null;
     }
 
     // CREATE (c == null) y UPDATE (solo la descripción)
@@ -147,8 +161,10 @@
                 + (editar ? ' readonly value="' + SIGH.esc(c.codigoCargo) + '"' : '') + '>'
                 + '<label for="fDescripcion">Descripción cargo</label><input id="fDescripcion" class="form-control" maxlength="60" placeholder="Ej.: Médico general"'
                 + (editar ? ' value="' + SIGH.esc(c.descripcion) + '"' : '') + '>'
-                + '<label for="fDepartamento">Departamento</label><select id="fDepartamento" class="custom-select"' + (editar ? " disabled" : "") + '>'
-                + opcionesDepartamento(editar ? c.codigoDepartamento : "") + '</select>'
+                + '<label for="fDepartamento">Departamento (escriba código o nombre para filtrar)</label>'
+                + '<input id="fDepartamento" class="form-control" list="listaDepartamentos" autocomplete="off" placeholder="Ej.: QUI o Quirófano"'
+                + (editar ? ' disabled value="' + SIGH.esc(c.codigoDepartamento + " - " + c.departamento) + '"' : '') + '>'
+                + '<datalist id="listaDepartamentos">' + opcionesDepartamento() + '</datalist>'
                 + '</div>',
             didOpen: function () {
                 const codigo = document.getElementById("fCodigo");
@@ -160,7 +176,7 @@
                 const datos = {
                     codigoCargo: document.getElementById("fCodigo").value.trim().toUpperCase(),
                     descripcion: document.getElementById("fDescripcion").value.trim(),
-                    codigoDepartamento: document.getElementById("fDepartamento").value
+                    codigoDepartamento: (departamentoElegido(document.getElementById("fDepartamento").value) || { codigo: editar ? c.codigoDepartamento : "" }).codigo
                 };
                 if (!/^[A-Z]{3}$/.test(datos.codigoCargo)) {
                     Swal.showValidationMessage("El código del cargo debe tener exactamente 3 letras (A-Z).");
@@ -171,7 +187,7 @@
                     return false;
                 }
                 if (!datos.codigoDepartamento) {
-                    Swal.showValidationMessage("Seleccione el departamento.");
+                    Swal.showValidationMessage("Escriba o elija un departamento de la lista (código o nombre).");
                     return false;
                 }
                 const url = editar
